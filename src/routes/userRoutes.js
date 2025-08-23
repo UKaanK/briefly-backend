@@ -1,5 +1,6 @@
 const express = require("express");
-const { registerUser } = require("../controllers/userController");
+const { registerUser ,loginUser,getProfile} = require("../controllers/userController");
+const { protect } = require("../middlewares/auth");
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ const router = express.Router();
  *       required:
  *         - name
  *         - email
- *         - password
+ *         - pwd
  *       properties:
  *         name:
  *           type: string
@@ -22,7 +23,7 @@ const router = express.Router();
  *           type: string
  *           description: Kullanıcının benzersiz e-posta adresi.
  *           example: eren.yilmaz@briefly.com
- *         password:
+ *         pwd:
  *           type: string
  *           description: Güvenli kullanıcı parolası.
  *           example: Parola123!
@@ -53,7 +54,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /register:
+ * /user/register:
  *   post:
  *     summary: Yeni bir kullanıcı kaydı oluşturur.
  *     tags: [Users]
@@ -75,6 +76,67 @@ const router = express.Router();
  *       500:
  *         description: Sunucu hatası.
  */
-router.post("/register", registerUser);
+router.post("/user/register", registerUser);
+/**
+ * @swagger
+ * /user/login:
+ *   post:
+ *     summary: Kullanıcı giriş yapar.
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - pwd
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Kullanıcının e-posta adresi.
+ *                 example: eren.yilmaz@briefly.com
+ *               pwd:
+ *                 type: string
+ *                 description: Kullanıcının şifresi.
+ *                 example: Parola123!
+ *     responses:
+ *       200:
+ *         description: Giriş başarılı, JWT token döner.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       400:
+ *         description: Geçersiz giriş bilgileri.
+ *       500:
+ *         description: Sunucu hatası.
+ */
+router.post("/user/login", loginUser);
 
+/**
+ * @swagger
+ * /user/profile:
+ *   get:
+ *     summary: Giriş yapan kullanıcının profil bilgilerini getirir.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Kullanıcı profili başarıyla getirildi.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       401:
+ *         description: Yetkisiz erişim, token gerekli.
+ *       500:
+ *         description: Sunucu hatası.
+ */
+router.get("/user/profile", protect, getProfile);
 module.exports = router;
