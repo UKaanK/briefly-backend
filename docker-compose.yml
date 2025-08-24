@@ -1,0 +1,16 @@
+services:
+  briefly-redis:
+    image: redis:6.2-alpine
+    container_name: briefly-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes # Parola gereksinimi kaldırıldı
+    environment:
+      # - REDIS_PASSWORD=${REDIS_PASSWORD} # Bu satıra artık gerek yok
+      - REDIS_PORT=${REDIS_PORT}
+
+volumes:
+  redis_data:

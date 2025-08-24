@@ -1,8 +1,10 @@
 const dotenv=require('dotenv')
 const jwt=require('jsonwebtoken')
+const redisClient=require("../utils/redis")
 dotenv.config({ path: __dirname + "/../../.env" });
 
-const protect= (req,res,next)=>{
+
+const protect= async (req,res,next)=>{
     let token;
 
     //1.İsteğin başlığındaki auth kısmını kontrol et
@@ -10,6 +12,15 @@ const protect= (req,res,next)=>{
         try {
             //2.Token'ı başık kısmına al   
             token = req.headers.authorization.split(" ")[1]
+
+            //3.Redis blacklist kontrolü
+            const isBlacklisted = await redisClient.get(`blacklist:${token}`);
+            if (isBlacklisted) {
+                return res.status(401).json({
+                    message:"Bu Token Artık Geçerli Değil,Lütfen Giriş Yapın"
+                })
+            }
+
 
             //3.Token'ı doğrula
             const decoded = jwt.verify(token,process.env.JWT_SECRET)

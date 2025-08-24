@@ -1,6 +1,8 @@
 const User=require('../models/user')
 const {hashPassword, comparePassword}=require("../utils/bcrypt")
-const {generateToken,verifyToken}=require('../utils/jwt')
+const {generateToken}=require('../utils/jwt')
+const redisClient=require("../utils/redis")
+const jwt=require("jsonwebtoken")
 
 const registerUser=async (req,res)=>{
     try {
@@ -63,6 +65,28 @@ const loginUser=async (req,res)=>{
     }
 }
 
+const logoutUser=async (req,res)=>{
+    try {
+        const token=req.headers.authorization.split(" ")[1]
+        const decoded=jwt.decode(token)
+        
+        //Tokenin kalan süresini saniye cinsinden bul
+        const expiration=decoded.exp-(Date.now()/1000)
+
+        //Tokeni rediste kara listeye al
+        //EX Parametresi tokeni kalan ömrü kadar rediste kalmasını sağlar.
+         await redisClient.set(`blacklist:${token}`, "true", "EX", Math.floor(expiration));
+            res.status(200).json({
+                message:"Çıkış Başarılı .Token Geçersiz Kılındı"
+            })
+        } catch (error) {
+        console.error("Çıkış Hatası",error)
+        res.status(500).json({
+            message:"Sunucu Hatası"
+        })
+    }
+}
+
 const getProfile=async (req,res)=>{
     try {
         //JWT middleware'i (auth.js) tarafından eklenen kullanıcı ID'sine erişiyoruz
@@ -86,4 +110,4 @@ const getProfile=async (req,res)=>{
     }
 }
 
-module.exports={registerUser,loginUser,getProfile}
+module.exports={registerUser,loginUser,getProfile,logoutUser}

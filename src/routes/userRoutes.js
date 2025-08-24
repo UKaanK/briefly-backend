@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerUser ,loginUser,getProfile} = require("../controllers/userController");
+const { registerUser ,loginUser,getProfile,logoutUser} = require("../controllers/userController");
 const { protect } = require("../middlewares/auth");
 
 const router = express.Router();
@@ -139,4 +139,30 @@ router.post("/user/login", loginUser);
  *         description: Sunucu hatası.
  */
 router.get("/user/profile", protect, getProfile);
+
+/**
+ * @swagger
+ * /user/logout:
+ *   post:
+ *     summary: Kullanıcının oturumunu kapatır.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Kullanıcı başarıyla çıkış yaptı.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Çıkış işlemi başarılı.
+ *       401:
+ *         description: Yetkisiz erişim, geçerli bir token gerekli.
+ *       500:
+ *         description: Sunucu hatası.
+ */
+router.post("/user/logout",protect,logoutUser)
 module.exports = router;
