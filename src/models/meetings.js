@@ -1,7 +1,7 @@
 const {DataTypes} =require("sequelize")
 const {sequelize}=require("../db/index")
 const User=require("./user")
-const Meetings=sequelize.define('Meeting',{
+const Meeting=sequelize.define('Meeting',{
     id:{
         type:DataTypes.INTEGER,
         primaryKey:true,
@@ -35,6 +35,6 @@ updatedAt:false //updated_at kolonu devre dışı bırakılır.
 
 //Kullanıcı ve Toplantı arasında ilişki tanımla
 Meetings.belongsTo(User,{foreignKey:'userId'})
-User.hasMany(Meetings,{foreignKey:'userId'})
+User.hasMany(Meeting,{foreignKey:'userId'})
 
-module.exports=Meetings
+module.exports=Meeting

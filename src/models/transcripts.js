@@ -2,7 +2,7 @@ const {DataTypes} =require("sequelize")
 const {sequelize} =require("../db/index")
 const Meetings = require("./meetings")
 
-const Transcripts =sequelize.define('Transcripts',{
+const Transcript =sequelize.define('Transcript',{
     id:{
         type:DataTypes.INTEGER,
         primaryKey:true,
@@ -29,7 +29,7 @@ const Transcripts =sequelize.define('Transcripts',{
     updatedAt:false
 })
 
-Meetings.hasOne(Transcripts,{foreignKey:'meeting_id'})
-Transcripts.belongsTo(Meetings,{foreignKey:'meeting_id'})
+Meetings.hasOne(Transcript,{foreignKey:'meeting_id'})
+Transcript.belongsTo(Meetings,{foreignKey:'meeting_id'})
 
-module.exports=Transcripts;
+module.exports=Transcript;
